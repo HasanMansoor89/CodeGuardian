@@ -117,7 +117,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - **Hasan Mansoor**
 - **Syed Danish Khurram**
-- **Muhammad Farasat Khan**
+- **Muhammad Farasat Azeemi**
 
 ## �📄 License
 
@@ -127,6 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built with [Shadcn UI](https://ui.shadcn.com/) components.
 - Powered by [Google Gemini](https://deepmind.google/technologies/gemini/).
+
 
 
 
