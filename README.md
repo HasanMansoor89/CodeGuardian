@@ -6,7 +6,8 @@
 ## 🚀 Features
 
 - **AI-Powered Security Analysis**: Leverages Google's Gemini models to detect complex security vulnerabilities that static analysis tools might miss.
-- **Comprehensive Vulnerability Detection**: Identifies:
+- **Comprehensive Vulnerability Detection**:
+  Identifies:
   - 🔑 Hardcoded Secrets & API Keys
   - 💉 SQL Injection & XSS
   - 🔓 Authentication & Authorization Flaws
@@ -126,7 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built with [Shadcn UI](https://ui.shadcn.com/) components.
 - Powered by [Google Gemini](https://deepmind.google/technologies/gemini/).
-# CodeGuardian
+
 
 
 
