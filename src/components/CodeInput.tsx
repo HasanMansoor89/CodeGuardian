@@ -32,31 +32,6 @@ export function CodeInput({ onSubmit, isAnalyzing, onClear, githubToken }: CodeI
     onSubmit([{ name: fileName || 'code.txt', content: pastedCode }]);
   }, [pastedCode, fileName, onSubmit]);
 
-  // Keyboard shortcut: Ctrl/Cmd + Enter to submit
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isAnalyzing) {
-        if (activeTab === 'paste' && pastedCode.trim()) {
-          handlePasteSubmit();
-        } else if (activeTab === 'github' && githubUrl.trim()) {
-          handleGitHubSubmit();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTab, pastedCode, githubUrl, isAnalyzing, handlePasteSubmit, handleGitHubSubmit]);
-
-  const handleClear = () => {
-    setPastedCode('');
-    setFileName('main.js');
-    setGitHubUrl('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    onClear?.();
-  };
-
   const handleGitHubSubmit = useCallback(async () => {
     if (!githubUrl.trim()) {
       toast.error('Please enter a GitHub URL');
@@ -82,6 +57,31 @@ export function CodeInput({ onSubmit, isAnalyzing, onClear, githubToken }: CodeI
       setIsFetchingRepo(false);
     }
   }, [githubUrl, githubToken, onSubmit]);
+
+  // Keyboard shortcut: Ctrl/Cmd + Enter to submit
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isAnalyzing) {
+        if (activeTab === 'paste' && pastedCode.trim()) {
+          handlePasteSubmit();
+        } else if (activeTab === 'github' && githubUrl.trim()) {
+          handleGitHubSubmit();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, pastedCode, githubUrl, isAnalyzing, handlePasteSubmit, handleGitHubSubmit]);
+
+  const handleClear = () => {
+    setPastedCode('');
+    setFileName('main.js');
+    setGitHubUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onClear?.();
+  };
 
   const processFiles = async (fileList: FileList | File[]) => {
     const files: CodeFile[] = [];
