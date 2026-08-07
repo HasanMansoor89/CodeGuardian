@@ -99,10 +99,6 @@ export async function analyzeCodeWithGemini(
     onChunk: (text: string) => void
 ) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash", // Updated to latest stable flash model if available, or 1.5-flash
-        systemInstruction: SECURITY_SYSTEM_PROMPT
-    });
 
     let codeContext = "";
     for (const file of files) {
@@ -119,8 +115,22 @@ Remember:
 - Be thorough but honest
 - Output one JSON object per line`;
 
+    async function tryGenerate(modelName: string) {
+        const model = genAI.getGenerativeModel({
+            model: modelName,
+            systemInstruction: SECURITY_SYSTEM_PROMPT
+        });
+        return await model.generateContentStream(userPrompt);
+    }
+
     try {
-        const result = await model.generateContentStream(userPrompt);
+        let result;
+        try {
+            result = await tryGenerate("gemini-2.0-flash");
+        } catch (err) {
+            console.warn("gemini-2.0-flash unavailable, attempting gemini-1.5-flash fallback:", err);
+            result = await tryGenerate("gemini-1.5-flash");
+        }
 
         for await (const chunk of result.stream) {
             const chunkText = chunk.text();

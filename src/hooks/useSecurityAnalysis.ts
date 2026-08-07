@@ -77,23 +77,38 @@ export function useSecurityAnalysis() {
 
     let depth = 0;
     let start = -1;
+    let inString = false;
+    let isEscaped = false;
 
     for (let i = 0; i < remaining.length; i++) {
       const char = remaining[i];
-      if (char === '{') {
-        if (depth === 0) start = i;
-        depth++;
-      } else if (char === '}') {
-        depth--;
-        if (depth === 0 && start !== -1) {
-          const jsonStr = remaining.slice(start, i + 1);
-          const event = tryParseJson(jsonStr);
-          if (event && event.type) {
-            events.push(event);
+
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === '\\') {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+      } else {
+        if (char === '"') {
+          inString = true;
+        } else if (char === '{') {
+          if (depth === 0) start = i;
+          depth++;
+        } else if (char === '}') {
+          depth--;
+          if (depth === 0 && start !== -1) {
+            const jsonStr = remaining.slice(start, i + 1);
+            const event = tryParseJson(jsonStr);
+            if (event && event.type) {
+              events.push(event);
+            }
+            remaining = remaining.slice(i + 1);
+            i = -1;
+            start = -1;
           }
-          remaining = remaining.slice(i + 1);
-          i = -1;
-          start = -1;
         }
       }
     }
@@ -114,7 +129,6 @@ export function useSecurityAnalysis() {
     signal: AbortSignal
   ): Promise<void> => {
 
-    // Import dynamically to avoid loading if not used or to ensure clean scope
     const { analyzeCodeWithGemini } = await import('@/lib/gemini');
 
     let accumulatedContent = '';
@@ -131,9 +145,12 @@ export function useSecurityAnalysis() {
       }
     });
 
-    // Process any remaining content (though extractJsonObjects handles partial JSONs, 
-    // we might need to be careful if Gemini finishes but JSON is incomplete)
-    // Generally stream ends with valid JSONs.
+    if (accumulatedContent.trim()) {
+      const { events } = extractJsonObjects(accumulatedContent + '\n');
+      for (const event of events) {
+        handleAnalysisEvent(event);
+      }
+    }
   }, [handleAnalysisEvent, extractJsonObjects]);
 
   const analyzeCode = useCallback(async (files: CodeFile[], explanationLevel: ExplanationLevel, apiKey: string) => {

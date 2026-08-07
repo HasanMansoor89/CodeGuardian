@@ -18,10 +18,26 @@ interface SettingsDialogProps {
     onApiKeyChange: (key: string) => void;
     githubToken: string;
     onGithubTokenChange: (token: string) => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export function SettingsDialog({ apiKey, onApiKeyChange, githubToken, onGithubTokenChange }: SettingsDialogProps) {
-    const [open, setOpen] = useState(false);
+export function SettingsDialog({
+    apiKey,
+    onApiKeyChange,
+    githubToken,
+    onGithubTokenChange,
+    open: externalOpen,
+    onOpenChange: externalOnOpenChange
+}: SettingsDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isControlled = externalOpen !== undefined;
+    const open = isControlled ? externalOpen : internalOpen;
+    const setOpen = (newOpen: boolean) => {
+        if (externalOnOpenChange) externalOnOpenChange(newOpen);
+        if (!isControlled) setInternalOpen(newOpen);
+    };
+
     const [localApiKey, setLocalApiKey] = useState(apiKey);
     const [localGithubToken, setLocalGithubToken] = useState(githubToken);
     const [showKey, setShowKey] = useState(false);

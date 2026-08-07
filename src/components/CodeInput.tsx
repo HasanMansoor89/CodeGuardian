@@ -45,7 +45,7 @@ export function CodeInput({ onSubmit, isAnalyzing, onClear, githubToken }: CodeI
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTab, pastedCode, githubUrl, isAnalyzing, handlePasteSubmit]);
+  }, [activeTab, pastedCode, githubUrl, isAnalyzing, handlePasteSubmit, handleGitHubSubmit]);
 
   const handleClear = () => {
     setPastedCode('');
@@ -57,7 +57,7 @@ export function CodeInput({ onSubmit, isAnalyzing, onClear, githubToken }: CodeI
     onClear?.();
   };
 
-  const handleGitHubSubmit = async () => {
+  const handleGitHubSubmit = useCallback(async () => {
     if (!githubUrl.trim()) {
       toast.error('Please enter a GitHub URL');
       return;
@@ -81,7 +81,7 @@ export function CodeInput({ onSubmit, isAnalyzing, onClear, githubToken }: CodeI
     } finally {
       setIsFetchingRepo(false);
     }
-  };
+  }, [githubUrl, githubToken, onSubmit]);
 
   const processFiles = async (fileList: FileList | File[]) => {
     const files: CodeFile[] = [];

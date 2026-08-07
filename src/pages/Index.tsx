@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { useSecurityAnalysis } from '@/hooks/useSecurityAnalysis';
 import { ExplanationLevel, CodeFile, SeverityFilter, AnalysisMetadata } from '@/types/security';
 
+import { toast } from 'sonner';
+
 const Index = () => {
   const [explanationLevel, setExplanationLevel] = useState<ExplanationLevel>('beginner');
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
@@ -22,6 +24,7 @@ const Index = () => {
   const [fileFilter, setFileFilter] = useState<string | null>(null);
   const [currentVulnIndex, setCurrentVulnIndex] = useState(0);
   const [analysisMetadata, setAnalysisMetadata] = useState<AnalysisMetadata | undefined>();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const vulnListRef = useRef<HTMLDivElement>(null);
 
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
@@ -56,7 +59,8 @@ const Index = () => {
 
   const handleAnalyze = (files: CodeFile[]) => {
     if (!apiKey) {
-      alert("Please configure your Google Gemini API Key in Settings (gear icon) to proceed.");
+      toast.error("Please configure your Google Gemini API Key in Settings to proceed.");
+      setIsSettingsOpen(true);
       return;
     }
 
@@ -162,6 +166,8 @@ const Index = () => {
               onApiKeyChange={handleApiKeyChange}
               githubToken={githubToken}
               onGithubTokenChange={handleGithubTokenChange}
+              open={isSettingsOpen}
+              onOpenChange={setIsSettingsOpen}
             />
             {hasResults && !isAnalyzing && (
               <ExportReport
